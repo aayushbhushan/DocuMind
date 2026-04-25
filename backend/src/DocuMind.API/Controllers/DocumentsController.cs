@@ -12,10 +12,7 @@ public class DocumentsController : ControllerBase
     public DocumentsController(IDocumentService documentService)
         => _documentService = documentService;
 
-    /// <summary>
-    /// POST /api/documents/upload
-    /// Accepts a multipart/form-data file, extracts text, chunks it, and stores it.
-    /// </summary>
+    /// <summary>POST /api/documents/upload — Extracts text, chunks, and stores the document.</summary>
     [HttpPost("upload")]
     public async Task<IActionResult> Upload(IFormFile file)
     {
@@ -27,18 +24,8 @@ public class DocumentsController : ControllerBase
             var result = await _documentService.UploadDocumentAsync(file);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"An error occurred while uploading the document: {ex.Message}");
-        }
+        catch (ArgumentException ex) { return BadRequest(ex.Message); }
+        catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
     }
 
     /// <summary>GET /api/documents — Returns all documents as summary objects.</summary>
@@ -52,5 +39,17 @@ public class DocumentsController : ControllerBase
     {
         var doc = await _documentService.GetDocumentAsync(id);
         return doc is null ? NotFound() : Ok(doc);
+    }
+
+    /// <summary>POST /api/documents/generate-embeddings/{id:int — Generates and stores embeddings for all chunks.</summary>
+    [HttpPost("generate-embeddings/{id:int}")]
+    public async Task<IActionResult> GenerateEmbeddings(int id)
+    {
+        try
+        {
+            var count = await _documentService.GenerateEmbeddingsAsync(id);
+            return Ok(new { documentId = id, embeddingsGenerated = count });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
     }
 }

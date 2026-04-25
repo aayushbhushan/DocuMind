@@ -1,19 +1,41 @@
-// REST endpoint for document-grounded chat (RAG question-answering)
 namespace DocuMind.API.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
 using DocuMind.Application.DTOs.Chat;
 using DocuMind.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ChatController : ControllerBase
 {
-    private readonly ChatService _chatService;
+    private readonly IChatService _chatService;
 
-    public ChatController(ChatService chatService) => _chatService = chatService;
+    public ChatController(IChatService chatService) => _chatService = chatService;
 
-    [HttpPost]
-    public async Task<IActionResult> Ask([FromBody] ChatRequest request, CancellationToken ct)
-        => Ok(await _chatService.AskAsync(request, ct));
+    /// <summary>POST /api/chat/ask — RAG question-answering against a specific document.</summary>
+    [HttpPost("ask")]
+    public async Task<IActionResult> Ask([FromBody] ChatRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Question))
+            return BadRequest("Question is required.");
+
+        try
+        {
+            var response = await _chatService.AskQuestionAsync(request);
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
+    }
+
+    /// <summary>POST /api/chat/summarize/{documentId} — Generates an AI summary of the document.</summary>
+    [HttpPost("summarize/{documentId:int}")]
+    public async Task<IActionResult> Summarize(int documentId)
+    {
+        try
+        {
+            var summary = await _chatService.SummarizeDocumentAsync(documentId);
+            return Ok(new { documentId, summary });
+        }
+        catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
+    }
 }
