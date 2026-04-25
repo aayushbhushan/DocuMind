@@ -1,0 +1,40 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+*.suo
+*.DotSettings.user
+.idea/
+
+# EF Migrations (keep folder, ignore auto-generated files)
+# Uncomment if you want to exclude migrations: **/Migrations/
+
+# Secrets & environment
+.env
+.env.local
+.env.*.local
+appsettings.Production.json
+appsettings.Development.json
+**/appsettings.*.json.bak
+
+# Next.js
+.next/
+out/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Publish output
+publish/
