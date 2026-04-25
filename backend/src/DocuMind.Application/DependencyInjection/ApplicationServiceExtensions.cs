@@ -9,6 +9,7 @@ public static class ApplicationServiceExtensions
     {
         services.AddScoped<TextChunkingService>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IChatService, ChatService>();
         return services;
     }
 }

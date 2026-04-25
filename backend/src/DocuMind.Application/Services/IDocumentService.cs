@@ -15,4 +15,7 @@ public interface IDocumentService
 
     /// <summary>Returns all documents as lightweight summary objects.</summary>
     Task<List<DocumentSummaryResponse>> GetAllDocumentsAsync();
+
+    /// <summary>Generates and stores embeddings for all chunks of the given document. Returns the chunk count.</summary>
+    Task<int> GenerateEmbeddingsAsync(int documentId);
 }

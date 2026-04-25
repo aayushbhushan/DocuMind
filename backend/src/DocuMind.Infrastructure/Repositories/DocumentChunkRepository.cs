@@ -4,6 +4,7 @@ using DocuMind.Core.Entities;
 using DocuMind.Core.Interfaces.Repositories;
 using DocuMind.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Pgvector;
 
 public class DocumentChunkRepository : IDocumentChunkRepository
 {
@@ -11,7 +12,6 @@ public class DocumentChunkRepository : IDocumentChunkRepository
 
     public DocumentChunkRepository(AppDbContext db) => _db = db;
 
-    /// <summary>Bulk-inserts all chunks in a single SaveChanges call.</summary>
     public async Task CreateManyAsync(List<DocumentChunk> chunks)
     {
         var now = DateTime.UtcNow;
@@ -22,14 +22,31 @@ public class DocumentChunkRepository : IDocumentChunkRepository
         await _db.SaveChangesAsync();
     }
 
-    /// <summary>Returns all chunks for a document ordered by ChunkIndex ascending.</summary>
     public Task<List<DocumentChunk>> GetByDocumentIdAsync(int documentId)
         => _db.DocumentChunks
               .Where(c => c.DocumentId == documentId)
               .OrderBy(c => c.ChunkIndex)
               .ToListAsync();
 
-    /// <summary>Vector similarity search — implemented in Day 4.</summary>
-    public Task<List<DocumentChunk>> SearchSimilarAsync(float[] queryEmbedding, int topK)
-        => throw new NotImplementedException("Embedding search is implemented in Day 4.");
+    public Task<List<DocumentChunk>> GetSimilarChunksAsync(int documentId, float[] queryEmbedding, int topK = 5)
+    {
+        var queryVector = new Vector(queryEmbedding);
+        return _db.DocumentChunks
+            .FromSqlInterpolated($"""
+                SELECT * FROM document_chunks
+                WHERE "DocumentId" = {documentId}
+                  AND "Embedding" IS NOT NULL
+                ORDER BY "Embedding" <=> {queryVector}
+                LIMIT {topK}
+                """)
+            .ToListAsync();
+    }
+
+    public async Task UpdateEmbeddingAsync(int chunkId, float[] embedding)
+    {
+        var chunk = await _db.DocumentChunks.FindAsync(chunkId)
+            ?? throw new InvalidOperationException($"Chunk {chunkId} not found.");
+        chunk.Embedding = embedding;
+        await _db.SaveChangesAsync();
+    }
 }

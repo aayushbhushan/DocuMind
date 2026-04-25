@@ -10,6 +10,12 @@ public interface IDocumentChunkRepository
     /// <summary>Returns all chunks for a document ordered by ChunkIndex ascending.</summary>
     Task<List<DocumentChunk>> GetByDocumentIdAsync(int documentId);
 
-    /// <summary>Finds the topK most similar chunks to the given query embedding (implemented in Day 4).</summary>
-    Task<List<DocumentChunk>> SearchSimilarAsync(float[] queryEmbedding, int topK);
+    /// <summary>
+    /// Returns the topK chunks most similar to queryEmbedding using pgvector cosine distance.
+    /// Only considers chunks that already have an embedding stored.
+    /// </summary>
+    Task<List<DocumentChunk>> GetSimilarChunksAsync(int documentId, float[] queryEmbedding, int topK = 5);
+
+    /// <summary>Stores the computed embedding on an existing chunk.</summary>
+    Task UpdateEmbeddingAsync(int chunkId, float[] embedding);
 }

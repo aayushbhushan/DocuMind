@@ -12,17 +12,20 @@ public class DocumentService : IDocumentService
     private readonly IDocumentChunkRepository _chunkRepository;
     private readonly IFileProcessingService _fileProcessing;
     private readonly TextChunkingService _chunker;
+    private readonly IAIService _aiService;
 
     public DocumentService(
         IDocumentRepository documentRepository,
         IDocumentChunkRepository chunkRepository,
         IFileProcessingService fileProcessing,
-        TextChunkingService chunker)
+        TextChunkingService chunker,
+        IAIService aiService)
     {
         _documentRepository = documentRepository;
         _chunkRepository = chunkRepository;
         _fileProcessing = fileProcessing;
         _chunker = chunker;
+        _aiService = aiService;
     }
 
     /// <summary>
@@ -104,5 +107,18 @@ public class DocumentService : IDocumentService
             FileSize = doc.FileSize,
             CreatedAt = doc.CreatedAt
         }).ToList();
+    }
+
+    public async Task<int> GenerateEmbeddingsAsync(int documentId)
+    {
+        var chunks = await _chunkRepository.GetByDocumentIdAsync(documentId);
+
+        foreach (var chunk in chunks)
+        {
+            var embedding = await _aiService.GenerateEmbeddingAsync(chunk.Content);
+            await _chunkRepository.UpdateEmbeddingAsync(chunk.Id, embedding);
+        }
+
+        return chunks.Count;
     }
 }

@@ -16,4 +16,6 @@ public class DocumentSummaryResponse
 
     /// <summary>UTC timestamp when the document was uploaded.</summary>
     public DateTime CreatedAt { get; set; }
+
+    public string? Summary { get; set; }
 }

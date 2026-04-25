@@ -4,6 +4,7 @@ using DocuMind.Core.Interfaces.Repositories;
 using DocuMind.Core.Interfaces.Services;
 using DocuMind.Infrastructure.Data;
 using DocuMind.Infrastructure.Repositories;
+using DocuMind.Infrastructure.Services.AI;
 using DocuMind.Infrastructure.Services.FileProcessing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,13 @@ public static class InfrastructureServiceExtensions
 
         // ── File processing ───────────────────────────────────────────────────
         services.AddScoped<IFileProcessingService, PdfProcessingService>();
+
+        // ── AI service (provider selected via AI:Provider config) ─────────────
+        var provider = config["AI:Provider"] ?? "ollama";
+        if (provider.Equals("openai", StringComparison.OrdinalIgnoreCase))
+            services.AddHttpClient<IAIService, OpenAIService>(c => c.Timeout = TimeSpan.FromSeconds(60));
+        else
+            services.AddHttpClient<IAIService, OllamaService>(c => c.Timeout = TimeSpan.FromMinutes(5));
 
         return services;
     }

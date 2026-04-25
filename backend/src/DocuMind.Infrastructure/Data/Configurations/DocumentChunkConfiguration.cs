@@ -28,7 +28,7 @@ public class DocumentChunkConfiguration : IEntityTypeConfiguration<DocumentChunk
         // Dimension is 1536 (OpenAI); Ollama nomic-embed-text uses 768.
         // ValueComparer ensures EF detects changes to the array elements.
         builder.Property(c => c.Embedding)
-            .HasColumnType("vector(1536)")
+            .HasColumnType("vector(768)")
             .HasConversion(
                 v => v == null ? null : new Vector(v),
                 v => v == null ? null : v.ToArray()
