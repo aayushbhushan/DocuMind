@@ -39,7 +39,7 @@ coverage/
 # Publish output
 publish/
 
-
-
-echo "**/bin/" >> ../.gitignore
-echo "**/obj/" >> ../.gitignore
+**/bin/
+**/obj/
+backend/src/**/bin/
+backend/src/**/obj/
