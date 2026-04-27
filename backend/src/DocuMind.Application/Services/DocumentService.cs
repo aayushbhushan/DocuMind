@@ -36,7 +36,11 @@ public class DocumentService : IDocumentService
         if (file is null || file.Length == 0)
             throw new ArgumentException("File is null or empty.");
 
-        // 1. Extract raw text from the file
+        // 1. Read raw bytes (needed for the file viewer) + extract text
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        var fileBytes = ms.ToArray();
+
         var rawText = await _fileProcessing.ExtractTextAsync(file);
 
         // 2. Split into overlapping word chunks
@@ -48,7 +52,8 @@ public class DocumentService : IDocumentService
             FileName = file.FileName,
             FileType = Path.GetExtension(file.FileName).TrimStart('.').ToLower(),
             RawText = rawText,
-            FileSize = file.Length
+            FileSize = file.Length,
+            FileBytes = fileBytes
         };
 
         var saved = await _documentRepository.CreateAsync(document);
@@ -90,7 +95,9 @@ public class DocumentService : IDocumentService
             FileType = doc.FileType,
             FileSize = doc.FileSize,
             ChunkCount = doc.Chunks.Count,
-            CreatedAt = doc.CreatedAt
+            CreatedAt = doc.CreatedAt,
+            RawText = doc.RawText,
+            FileBytes = doc.FileBytes
         };
     }
 
@@ -121,4 +128,7 @@ public class DocumentService : IDocumentService
 
         return chunks.Count;
     }
+
+    public Task DeleteDocumentAsync(int id)
+        => _documentRepository.DeleteAsync(id);
 }

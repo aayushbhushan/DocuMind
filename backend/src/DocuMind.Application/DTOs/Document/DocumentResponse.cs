@@ -19,4 +19,10 @@ public class DocumentResponse
 
     /// <summary>UTC timestamp when the document was uploaded.</summary>
     public DateTime CreatedAt { get; set; }
+
+    /// <summary>Full extracted text — returned by GET /api/documents/{id} for the viewer.</summary>
+    public string RawText { get; set; } = string.Empty;
+
+    /// <summary>Raw file bytes — returned by GET /api/documents/{id} for the file endpoint.</summary>
+    public byte[]? FileBytes { get; set; }
 }

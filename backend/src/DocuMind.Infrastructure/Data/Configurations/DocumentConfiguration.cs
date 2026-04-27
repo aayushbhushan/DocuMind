@@ -27,6 +27,11 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.Property(d => d.FileSize)
             .IsRequired();
 
+        // bytea column — nullable because existing rows have no stored file yet
+        builder.Property(d => d.FileBytes)
+            .HasColumnType("bytea")
+            .IsRequired(false);
+
         builder.Property(d => d.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("now() at time zone 'utc'");

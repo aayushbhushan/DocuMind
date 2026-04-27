@@ -12,4 +12,7 @@ public interface IDocumentRepository
 
     /// <summary>Returns all documents ordered by CreatedAt descending.</summary>
     Task<List<Document>> GetAllAsync();
+
+    /// <summary>Deletes a document and its chunks by Id. Throws if not found.</summary>
+    Task DeleteAsync(int id);
 }

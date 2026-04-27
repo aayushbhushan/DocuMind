@@ -17,6 +17,9 @@ public class Document
     /// <summary>Size of the original uploaded file in bytes.</summary>
     public long FileSize { get; set; }
 
+    /// <summary>Raw binary content of the original uploaded file (PDF or TXT bytes).</summary>
+    public byte[]? FileBytes { get; set; }
+
     /// <summary>UTC timestamp when the document was first uploaded.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

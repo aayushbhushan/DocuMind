@@ -34,6 +34,8 @@ public static class InfrastructureServiceExtensions
         var provider = config["AI:Provider"] ?? "ollama";
         if (provider.Equals("openai", StringComparison.OrdinalIgnoreCase))
             services.AddHttpClient<IAIService, OpenAIService>(c => c.Timeout = TimeSpan.FromSeconds(60));
+        else if (provider.Equals("gemini", StringComparison.OrdinalIgnoreCase))
+            services.AddHttpClient<IAIService, GeminiService>(c => c.Timeout = TimeSpan.FromSeconds(60));
         else
             services.AddHttpClient<IAIService, OllamaService>(c => c.Timeout = TimeSpan.FromMinutes(5));
 

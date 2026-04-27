@@ -32,4 +32,13 @@ public class DocumentRepository : IDocumentRepository
         => _db.Documents
               .OrderByDescending(d => d.CreatedAt)
               .ToListAsync();
+
+    /// <summary>Deletes a document and all its chunks (cascade via FK). Throws if not found.</summary>
+    public async Task DeleteAsync(int id)
+    {
+        var doc = await _db.Documents.FindAsync(id)
+            ?? throw new InvalidOperationException($"Document {id} not found.");
+        _db.Documents.Remove(doc);
+        await _db.SaveChangesAsync();
+    }
 }

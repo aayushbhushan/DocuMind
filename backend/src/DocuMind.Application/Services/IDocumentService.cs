@@ -18,4 +18,7 @@ public interface IDocumentService
 
     /// <summary>Generates and stores embeddings for all chunks of the given document. Returns the chunk count.</summary>
     Task<int> GenerateEmbeddingsAsync(int documentId);
+
+    /// <summary>Deletes a document and all its chunks. Throws if not found.</summary>
+    Task DeleteDocumentAsync(int id);
 }
