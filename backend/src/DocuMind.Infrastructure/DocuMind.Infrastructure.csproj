@@ -19,11 +19,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
-
-  <ItemGroup>
-    <!-- Prevent SDK default glob from failing when no .resx files exist -->
-    <EmbeddedResource Remove="**/*.resx" />
-  </ItemGroup>
 
 </Project>
