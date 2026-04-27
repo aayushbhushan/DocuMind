@@ -20,6 +20,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <!-- Workaround: Pgvector.EntityFrameworkCore 0.3.0 targets file uses
+         $(DefaultLanguageSourceExtension) which resolves empty on Linux .NET 10,
+         producing a literal '**/*.cs' compile item. Force it to .cs. -->
+    <DefaultLanguageSourceExtension>.cs</DefaultLanguageSourceExtension>
   </PropertyGroup>
 
 </Project>
