@@ -32,7 +32,6 @@ public class GeminiService : IAIService
         var url = $"{BaseUrl}/{_embeddingModel}:embedContent?key={_apiKey}";
         var body = new
         {
-            model = $"models/{_embeddingModel}",
             content = new
             {
                 parts = new[] { new { text } }
@@ -44,7 +43,8 @@ public class GeminiService : IAIService
             var response = await _http.PostAsJsonAsync(url, body);
             response.EnsureSuccessStatusCode();
 
-            using var doc = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+            using var doc = await JsonDocument.ParseAsync(
+                await response.Content.ReadAsStreamAsync());
             return doc.RootElement
                 .GetProperty("embedding")
                 .GetProperty("values")
