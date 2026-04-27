@@ -37,19 +37,20 @@ var app = builder.Build();
 // ── Global exception handler ──────────────────────────────────────────────────
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ── Swagger enabled for ALL environments (needed for production demo) ─────────
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+// ── HTTPS redirect removed — Render handles HTTPS termination itself ──────────
 
 // ── CORS must come before MapControllers ──────────────────────────────────────
 app.UseCors("AllowFrontend");
 
 app.MapControllers();
 
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { 
+    status = "healthy", 
+    timestamp = DateTime.UtcNow 
+}));
 
 app.Run();
