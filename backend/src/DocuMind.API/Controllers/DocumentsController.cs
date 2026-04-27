@@ -41,7 +41,7 @@ public class DocumentsController : ControllerBase
         return doc is null ? NotFound() : Ok(doc);
     }
 
-    /// <summary>POST /api/documents/generate-embeddings/{id:int — Generates and stores embeddings for all chunks.</summary>
+    /// <summary>POST /api/documents/generate-embeddings/{id} — Generates and stores embeddings for all chunks.</summary>
     [HttpPost("generate-embeddings/{id:int}")]
     public async Task<IActionResult> GenerateEmbeddings(int id)
     {
@@ -51,5 +51,28 @@ public class DocumentsController : ControllerBase
             return Ok(new { documentId = id, embeddingsGenerated = count });
         }
         catch (InvalidOperationException ex) { return BadRequest(ex.Message); }
+    }
+
+    /// <summary>GET /api/documents/{id}/file — Returns the raw file bytes for PDF or TXT documents.</summary>
+    [HttpGet("{id:int}/file")]
+    public async Task<IActionResult> GetFile(int id)
+    {
+        var doc = await _documentService.GetDocumentAsync(id);
+        if (doc is null) return NotFound();
+        if (doc.FileBytes is null || doc.FileBytes.Length == 0) return NotFound("File bytes not available for this document.");
+        var contentType = doc.FileType == "pdf" ? "application/pdf" : "text/plain";
+        return File(doc.FileBytes, contentType, doc.FileName);
+    }
+
+    /// <summary>DELETE /api/documents/{id} — Permanently deletes a document and its chunks.</summary>
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            await _documentService.DeleteDocumentAsync(id);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex) { return NotFound(ex.Message); }
     }
 }

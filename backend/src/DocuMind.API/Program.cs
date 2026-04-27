@@ -11,12 +11,25 @@ builder.Services.AddEndpointsApiExplorer();
 // ── Swagger ───────────────────────────────────────────────────────────────────
 builder.Services.AddSwaggerGen();
 
+// ── CORS ──────────────────────────────────────────────────────────────────────
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:3000",
+                "https://*.vercel.app"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // ── Infrastructure layer ──────────────────────────────────────────────────────
-// Registers: AppDbContext (PostgreSQL + pgvector), repositories, IFileProcessingService
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // ── Application layer ─────────────────────────────────────────────────────────
-// Registers: TextChunkingService, IDocumentService → DocumentService
 builder.Services.AddApplication();
 
 var app = builder.Build();
@@ -31,5 +44,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// ── CORS must come before MapControllers ──────────────────────────────────────
+app.UseCors("AllowFrontend");
+
 app.MapControllers();
+
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
+
 app.Run();

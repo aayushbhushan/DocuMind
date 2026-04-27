@@ -28,9 +28,8 @@ public class GlobalExceptionMiddleware
             _logger.LogError(ex, "Unhandled exception");
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
-            var error = _env.IsDevelopment()
-                ? new { error = ex.Message, detail = ex.ToString() }
-                : new { error = "An unexpected error occurred.", detail = (string?)null };
+            var detail = _env.IsDevelopment() ? ex.ToString() : null;
+            var error = new { error = _env.IsDevelopment() ? ex.Message : "An unexpected error occurred.", detail };
             await context.Response.WriteAsync(JsonSerializer.Serialize(error));
         }
     }
