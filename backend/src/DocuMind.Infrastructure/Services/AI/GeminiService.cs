@@ -22,8 +22,8 @@ public class GeminiService : IAIService
         _logger = logger;
         _apiKey = config["AI:GeminiApiKey"]
             ?? throw new InvalidOperationException("AI:GeminiApiKey is not configured.");
-        _chatModel = config["AI:ChatModel"] ?? "gemini-2.0-flash";
-        _embeddingModel = config["AI:EmbeddingModel"] ?? "text-embedding-004";
+        _chatModel = config["AI:ChatModel"] ?? "gemini-2.5-flash";
+        _embeddingModel = config["AI:EmbeddingModel"] ?? "gemini-embedding-001";
     }
 
     /// <summary>Generates a vector embedding for the given text using Gemini text-embedding-004.</summary>
