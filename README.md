@@ -3,8 +3,8 @@
 > AI-powered document intelligence platform
 
 ## Live Demo
-- Frontend: [Vercel URL - coming soon]
-- Backend API: [Render URL]/swagger
+- Frontend: [Vercel URL - https://docu-mind-iota.vercel.app/]
+- Backend API: (https://documind-api-vt7z.onrender.com/swagger/index.html)
 
 ## Tech Stack
 
