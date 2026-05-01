@@ -46,13 +46,20 @@ public class ChatService : IChatService
     }
 
     public async Task<string> SummarizeDocumentAsync(int documentId)
-    {
-        var chunks = await _chunkRepository.GetByDocumentIdAsync(documentId);
+{
+    var chunks = await _chunkRepository.GetByDocumentIdAsync(documentId);
 
-        if (chunks.Count == 0)
-            throw new InvalidOperationException($"No chunks found for document {documentId}.");
+    if (chunks.Count == 0)
+        throw new InvalidOperationException($"No chunks found for document {documentId}.");
 
-        var fullText = string.Join("\n\n", chunks.Select(c => c.Content));
-        return await _aiService.GenerateSummaryAsync(fullText);
-    }
+    // Take only first 10 chunks to avoid token limit
+    var limitedChunks = chunks.Take(10).ToList();
+    var fullText = string.Join("\n\n", limitedChunks.Select(c => c.Content));
+
+    // Also limit total characters to ~8000 (safe for free tier)
+    if (fullText.Length > 8000)
+        fullText = fullText.Substring(0, 8000);
+
+    return await _aiService.GenerateSummaryAsync(fullText);
+}
 }
